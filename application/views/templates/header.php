@@ -12,7 +12,15 @@
     <meta name="description" content=""/>
     <!-- Bootstrap core CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?php echo base_url(); ?>assets/font-awesome/css/font-awesome.min.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="container">
+    <?php
+    if (isset($author)) {
+        echo "Welcome, $author ";
+        echo "<a href='/authors/logout'>(Logout)</a><br/>";
+    }
+    ?>
+
     <h1><?php echo $title; ?></h1>

@@ -5,8 +5,10 @@
  * @property News_model $news_model The News model
  * @property CI_Form_validation $form_validation The form validation lib
  * @property CI_Input $input The input lib
+ * @property CI_Session $session The session lib
  */
-class News extends CI_Controller {
+class News extends CI_Controller
+{
 
     public function __construct()
     {
@@ -17,20 +19,26 @@ class News extends CI_Controller {
 
     public function index()
     {
-        $data['news'] = $this->news_model->get_news();
-        $data['title'] = 'News archive';
+        $author = $this->session->userdata('logged_in');
 
-        $this->load->view('templates/header', $data);
-        $this->load->view('news/index', $data);
-        $this->load->view('templates/footer');
+        if (!isset($author)) {
+            redirect('authors');
+        } else {
+            $data['news'] = $this->news_model->get_news();
+            $data['title'] = 'News archive';
+            $data['author'] = $this->session->userdata('name');
+
+            $this->load->view('templates/header', $data);
+            $this->load->view('news/index', $data);
+            $this->load->view('templates/footer');
+        }
     }
 
     public function view($id = NULL)
     {
         $data['news_item'] = $this->news_model->get_news($id);
 
-        if (empty($data['news_item']))
-        {
+        if (empty($data['news_item'])) {
             show_404();
         }
 
@@ -51,14 +59,11 @@ class News extends CI_Controller {
         $this->form_validation->set_rules('title', 'Title', 'required');
         $this->form_validation->set_rules('text', 'Text', 'required');
 
-        if ($this->form_validation->run() === FALSE)
-        {
+        if ($this->form_validation->run() === FALSE) {
             $this->load->view('templates/header', $data);
             $this->load->view('news/create');
             $this->load->view('templates/footer');
-        }
-        else
-        {
+        } else {
             $this->news_model->set_news($this->input->post_get('title', true), $this->input->post_get('text', true));
             $this->load->view('templates/header', $data);
             $this->load->view('news/success');
