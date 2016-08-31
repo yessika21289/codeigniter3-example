@@ -5,7 +5,7 @@
 
             <!-- the actual news item: title/author/date/content -->
             <h1>
-                <a href="<?php echo site_url('news/'.$news_item['slug']); ?>"><?php echo $news_item['title']; ?></a>
+                <a href="<?php echo site_url('news/'.$news_item['id']); ?>"><?php echo $news_item['title']; ?></a>
             </h1>
             <p class="lead">
                 <i class="fa fa-user"></i> by <a href=""><?= isset($user) ? $user['name'] : 'Unknown' ?></a>

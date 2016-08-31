@@ -25,9 +25,9 @@ class News extends CI_Controller {
         $this->load->view('templates/footer');
     }
 
-    public function view($slug = NULL)
+    public function view($id = NULL)
     {
-        $data['news_item'] = $this->news_model->get_news($slug);
+        $data['news_item'] = $this->news_model->get_news($id);
 
         if (empty($data['news_item']))
         {
