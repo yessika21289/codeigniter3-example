@@ -29,7 +29,7 @@ class Authors extends CI_Controller
         if (!isset($author)) {
             $data['title'] = 'Author Login';
             $this->load->view('templates/header', $data);
-            $this->load->view('authors/author_login');
+            $this->load->view('authors/login');
             $this->load->view('templates/footer');
         } else {
             redirect('news');
@@ -45,16 +45,19 @@ class Authors extends CI_Controller
 
         $this->form_validation->set_rules('name', 'Name', 'required');
         $this->form_validation->set_rules('email', 'Email', 'required');
-        $this->form_validation->set_rules('password', 'Password', 'required');
+        $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
+        $this->form_validation->set_message('min_length', '{field} must have at least {param} characters.');
+        $this->form_validation->set_rules('passconf', 'Password Confirmation', 'required|matches[password]');
 
         if ($this->form_validation->run() === FALSE) {
             $this->load->view('templates/header', $data);
-            $this->load->view('authors/author_register');
+            $this->load->view('authors/register');
             $this->load->view('templates/footer');
         } else {
             $new_author = $this->authors_model->set_author($this->input->post_get('name', true), $this->input->post_get('email', true), $this->input->post_get('password', true));
-            if($new_author) {
+            if ($new_author) {
                 $data = array(
+                    'id' => $new_author,
                     'name' => $this->input->post_get('name', true),
                     'email' => $this->input->post_get('email', true),
                     'logged_in' => TRUE
@@ -77,7 +80,7 @@ class Authors extends CI_Controller
         if ($this->form_validation->run() === FALSE) {
             $data['title'] = 'Author Login';
             $this->load->view('templates/header', $data);
-            $this->load->view('authors/author_login');
+            $this->load->view('authors/login');
             $this->load->view('templates/footer');
         } else {
             $email = $this->input->post_get('email', true);
@@ -85,6 +88,7 @@ class Authors extends CI_Controller
             $author = $this->authors_model->verify($email, $password);
             if (!empty($author)) {
                 $data = array(
+                    'id' => $author['id'],
                     'name' => $author['name'],
                     'email' => $author['email'],
                     'logged_in' => TRUE
@@ -94,9 +98,9 @@ class Authors extends CI_Controller
             } else {
                 $msg =
                     "<div class='alert alert-danger' role='alert'>
-					<strong>Login failed!</strong>
-					<br/>Username/Password do not match.
-				</div>";
+                        <strong>Login failed!</strong>
+                        <br/>Username/Password do not match.
+                    </div>";
                 $this->session->set_flashdata('login_failed_msg', $msg);
                 redirect('authors');
             }
@@ -107,6 +111,22 @@ class Authors extends CI_Controller
     {
         $this->session->sess_destroy();
         redirect('authors');
+    }
+
+    public function report()
+    {
+        $logged_in = $this->session->userdata('logged_in');
+
+        if (!$logged_in) {
+            redirect('authors');
+        } else {
+            $data['authors_report'] = $this->authors_model->get_report();
+            $data['title'] = 'Authors Report';
+            $data['author'] = $this->session->userdata('name');
+            $this->load->view('templates/header', $data);
+            $this->load->view('authors/report');
+            $this->load->view('templates/footer');
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 <?php
 /**
+ * Author login page
  * Created by PhpStorm.
  * User: Yessika
  * Date: 31/08/2016
@@ -9,10 +10,6 @@
 $errors = validation_errors();
 if (!empty($errors)) {
     echo $errors . '<hr/>';
-}
-
-if (!empty($msg)) {
-    echo $msg . '<hr/>';
 }
 
 ?>

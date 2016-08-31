@@ -4,7 +4,8 @@
  * Class News_model
  * @property CI_DB_driver|CI_DB_sqlite3_driver $db The DB driver
  */
-class News_model extends CI_Model {
+class News_model extends CI_Model
+{
 
     public function __construct()
     {
@@ -13,13 +14,21 @@ class News_model extends CI_Model {
 
     public function get_news($id = FALSE)
     {
-        if ($id === FALSE)
-        {
-            $query = $this->db->get('news');
+        if ($id === FALSE) {
+            $this->db->select('news.*, authors.id, authors.name, authors.email')
+                ->from('news')
+                ->join('authors', 'news.author_id = authors.id', 'left')
+                ->order_by('news.posted_on', 'DESC');
+            $query = $this->db->get();
             return $query->result_array();
         }
 
-        $query = $this->db->get_where('news', array('id' => $id));
+        $this->db->select('news.*, authors.id, authors.name, authors.email')
+            ->from('news')
+            ->join('authors', 'news.author_id = authors.id', 'left')
+            ->where('news.id', $id);
+        $query = $this->db->get();
+
         return $query->row_array();
     }
 
@@ -28,7 +37,7 @@ class News_model extends CI_Model {
      * @param string $text
      * @return mixed
      */
-    public function set_news($title, $text)
+    public function set_news($title, $text, $author_id)
     {
         $this->load->helper('url');
 
@@ -37,10 +46,16 @@ class News_model extends CI_Model {
         $data = array(
             'title' => $title,
             'slug' => $slug,
-            'text' => $text
+            'text' => $text,
+            'author_id' => $author_id,
+            'posted_on' => time()
         );
 
-        return $this->db->insert('news', $data);
+        if ($this->db->insert('news', $data)) {
+            return $this->db->insert_id();
+        } else {
+            return false;
+        }
     }
 
 }

@@ -21,6 +21,9 @@
         echo "Welcome, $author ";
         echo "<a href='/authors/logout'>(Logout)</a><br/>";
     }
+    if (!empty($msg)) {
+        echo $msg;
+    }
     ?>
 
     <h1><?php echo $title; ?></h1>
