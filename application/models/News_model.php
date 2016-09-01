@@ -12,6 +12,10 @@ class News_model extends CI_Model
         $this->load->database();
     }
 
+    /**
+     * @param bool $id
+     * @return array of news' data
+     */
     public function get_news($id = FALSE)
     {
         if ($id === FALSE) {
@@ -35,7 +39,7 @@ class News_model extends CI_Model
     /**
      * @param string $title
      * @param string $text
-     * @return mixed
+     * @return bool false if failed to insert news else news' inserted id
      */
     public function set_news($title, $text, $author_id)
     {

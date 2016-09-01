@@ -16,6 +16,9 @@ class Authors_model extends CI_Model
         $this->load->database();
     }
 
+    /**
+     * @return array of authors' data
+     */
     public function get_report() {
         $this->db->select('news.posted_on, news.title, MAX(news.id) as news_id, authors.id, authors.name, authors.email, COUNT(news.id) as posts')
             ->from('authors')
@@ -26,6 +29,12 @@ class Authors_model extends CI_Model
         return $query->result_array();
     }
 
+    /**
+     * @param $name
+     * @param $email
+     * @param $password
+     * @return bool false if failed to insert new author else author's inserted id
+     */
     public function set_author($name, $email, $password)
     {
         $data = array(
@@ -43,7 +52,7 @@ class Authors_model extends CI_Model
     /**
      * @param string $title
      * @param string $text
-     * @return mixed
+     * @return bool false if author not verified else array of author's logged in data
      */
     public function verify($email, $password)
     {

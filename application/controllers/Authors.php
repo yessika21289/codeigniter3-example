@@ -23,10 +23,11 @@ class Authors extends CI_Controller
 
     public function index()
     {
-        $author = $this->session->userdata('logged_in');
+        //check if author has yet logged in
+        $logged_in = $this->session->userdata('logged_in');
         $data['msg'] = $this->session->flashdata('login_failed_msg');
 
-        if (!isset($author)) {
+        if (!isset($logged_in)) {
             $data['title'] = 'Author Login';
             $this->load->view('templates/header', $data);
             $this->load->view('authors/login');
@@ -35,7 +36,7 @@ class Authors extends CI_Controller
             redirect('news');
         }
     }
-
+    
     public function register()
     {
         $this->load->helper(array('form', 'url'));
@@ -43,6 +44,7 @@ class Authors extends CI_Controller
 
         $data['title'] = 'Author Register';
 
+        //validation for registration form
         $this->form_validation->set_rules('name', 'Name', 'required');
         $this->form_validation->set_rules('email', 'Email', 'required');
         $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
@@ -54,8 +56,10 @@ class Authors extends CI_Controller
             $this->load->view('authors/register');
             $this->load->view('templates/footer');
         } else {
+            //call function in Authors model to insert new author
             $new_author = $this->authors_model->set_author($this->input->post_get('name', true), $this->input->post_get('email', true), $this->input->post_get('password', true));
             if ($new_author) {
+                //new author logged in right after registration success
                 $data = array(
                     'id' => $new_author,
                     'name' => $this->input->post_get('name', true),
@@ -74,6 +78,7 @@ class Authors extends CI_Controller
     {
         $this->load->library('form_validation');
 
+        //validation for login form
         $this->form_validation->set_rules('email', 'Email', 'required');
         $this->form_validation->set_rules('password', 'Password', 'required');
 
@@ -85,6 +90,7 @@ class Authors extends CI_Controller
         } else {
             $email = $this->input->post_get('email', true);
             $password = sha1(md5($this->input->post_get('password', true)));
+            //call function in Authors model to verify author login data
             $author = $this->authors_model->verify($email, $password);
             if (!empty($author)) {
                 $data = array(
@@ -96,6 +102,7 @@ class Authors extends CI_Controller
                 $this->session->set_userdata($data);
                 redirect('news');
             } else {
+                //set message if login failed
                 $msg =
                     "<div class='alert alert-danger' role='alert'>
                         <strong>Login failed!</strong>
@@ -109,17 +116,20 @@ class Authors extends CI_Controller
 
     public function logout()
     {
+        //delete session of logged in author
         $this->session->sess_destroy();
         redirect('authors');
     }
 
     public function report()
     {
+        //check if author has yet logged in
         $logged_in = $this->session->userdata('logged_in');
 
         if (!$logged_in) {
             redirect('authors');
         } else {
+            //call function in Authors model to get authors' data
             $data['authors_report'] = $this->authors_model->get_report();
             $data['title'] = 'Authors Report';
             $data['author'] = $this->session->userdata('name');
